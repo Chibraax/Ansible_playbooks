@@ -1,0 +1,105 @@
+--- 
+- hosts: app
+  gather_facts: yes
+  become: yes 
+
+  tasks:
+    - name : "Just check variables"
+      debug: 
+        var: ansible_facts.env.SUDO_USER
+        var: random_var
+
+    # # Update and Upgrade packages
+    # - name: "Update and upgrade packages"
+    #   shell: |
+    #     apt update
+    #     apt upgrade -y
+    #   register: package_update
+    # - debug:
+    #     var: package_update.stdout_lines
+
+    # Install all system packages 
+    - name: "Install OS packages"
+      package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ all_packages }}"
+
+    # Copy the apache config files
+    - name: "Copy apache conf file and webssh conf"
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root 
+        group: root 
+        mode: 0644
+
+      with_items:
+        - src: apache2.conf 
+          dest: /etc/apache2/
+        - src: webssh.conf
+          dest: /etc/apache2/sites-available/webssh.conf
+
+    # Clone the WebbSSH git repo
+    - name: "Git clone Webssh repo"
+      git:
+        repo: https://github.com/huashengdun/webssh 
+        dest: "/var/www/webssh/"
+      register: git_output
+
+    # Create all Virtual env
+    - name: "Create the virtualenv at /home/{{ ansible_facts.env.SUDO_USER }}/.envv"
+      shell: |
+        python3 -m venv /home/{{ ansible_facts.env.SUDO_USER }}/.envv
+
+    # Install all python Webssh package
+    - name: "Install webssh packages"
+      pip:
+        requirements: "/var/www/webssh/requirements.txt"
+        virtualenv: "/home/{{ ansible_facts.env.SUDO_USER }}/.envv"
+      register: pip_output
+    - debug:
+        var: pip_output.stdout_lines
+
+    # Generate the certificat with certbot
+    - name: Obtain a certificate (using standalone mode)
+      command: >
+        certbot certonly --standalone
+        -d alexandrelesieur.com
+        -d www.alexandrelesieur.com
+        --agree-tos
+        -m alexandrelesieur@hotmail.fr
+        --noninteractive
+      args:
+        creates: /etc/letsencrypt/live/alexandrelesieur.com/fullchain.pem
+      register: output_certbot
+
+    - debug:
+        var: output_certbot
+
+    # Enables all apache modules 
+    - name: Enables all apache modules 
+      ansible.builtin.shell: |
+        sudo systemctl start apache2
+        sudo a2enmod proxy proxy_http proxy_html proxy_wstunnel filter rewrite substitute ssl
+        sudo a2ensite webssh.conf
+        sudo a2ensite default-ssl.conf
+        systemctl reload apache2
+
+      register: enables_modules 
+    - debug:
+        var: enables_modules.stdout_lines
+      
+    # Start Webssh 
+    - name: Start Webssh
+      ansible.builtin.shell: |
+        source /home/{{ ansible_facts.env.SUDO_USER }}/.envv/bin/activate
+        cd /var/www/webssh
+        nohup python3 run.py --address=127.0.0.1 --origin=https://www.alexandrelesieur.com --port=8888 &
+      args:
+        executable: /bin/bash
+
+      register: start_webssh
+
+    - debug: 
+        var: start_webssh.stdout_lines

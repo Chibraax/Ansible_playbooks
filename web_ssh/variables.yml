@@ -1,0 +1,6 @@
+--- 
+- name: "Just some variables"
+  some_var: salut
+  list_var:
+    - certbot
+    - apache2

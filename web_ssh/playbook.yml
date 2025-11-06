@@ -1,0 +1,12 @@
+---
+- name: "Check"
+  hosts: all 
+  gather_facts: true 
+  become: yes 
+  vars_files:
+    - variables.yml
+
+  tasks:
+    - debug: 
+        msg: "Voici ma var :{{ some_var }}"
+

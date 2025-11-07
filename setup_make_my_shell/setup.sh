@@ -125,37 +125,26 @@ done
 # Moove plug-in into zsh dir
 echo -e "\n\n"
 while true; do
-  if [[ ! -z "$USER" && ! -z "$HOSTNAME" ]]; then
-    echo -e "1: ┌─[$USER💀$HOSTNAME]⚡⚡[/some/random/path]⚡⚡[0000]
-     └─[$]"
-    echo -e "2: ┌─[$USER🎃$HOSTNAME]🩸🩸[/some/random/path]🩸🩸[0000]
-     └─[$]"
-  else
-    echo -e "1: ┌─[user💀hostname]⚡⚡[/some/random/path]⚡⚡[0000]
-   └─[$]"
-    echo -e "2: ┌─[user🎃hostname]🩸🩸[/some/random/path]🩸🩸[0000]
-   └─[$]"
-  fi
 
-  read -p "What prompt do you prefer 1 or 2 ? " choice
-  echo -e "\n"
-  if [[ $choice -eq "1" ]] || [[ $choice -eq "2" ]]; then
-    if [[ $choice -eq "1" ]]; then
+  if [[ $@ -eq "1" ]] || [[ $@ -eq "2" ]]; then
+    if [[ $@ -eq "1" ]]; then
       sed -i 's/ZSH_THEME="[^"]*"/ZSH_THEME="chibraax"/g' .zshrc
       prompt1
       echo -e "[$GREEN+$RESET] Theme added to ~/.zshrc"
       echo -e "[$GREEN+$RESET] Theme located in : ~/.oh-my-zsh/themes/chibraax.zsh-theme"
       break
-    elif [[ "$choice" -eq "2" ]]; then
+    elif [[ "$@" -eq "2" ]]; then
       sed -i 's/ZSH_THEME="[^"]*"/ZSH_THEME="chibraax2"/g' .zshrc
       prompt2
       echo -e "["$GREEN"+"$RESET"] Theme added to ~/.zshrc"
       echo -e "["$GREEN"+"$RESET"] Theme located in : ~/.oh-my-zsh/themes/chibraax2.zsh-theme"
       break
     else
-      echo -e "Bad choice"
-      echo -e ""
-      continue
+      sed -i 's/ZSH_THEME="[^"]*"/ZSH_THEME="chibraax2"/g' .zshrc
+      prompt2
+      echo -e "["$GREEN"+"$RESET"] Theme added to ~/.zshrc"
+      echo -e "["$GREEN"+"$RESET"] Theme located in : ~/.oh-my-zsh/themes/chibraax2.zsh-theme"
+      break
     fi
   fi
 done

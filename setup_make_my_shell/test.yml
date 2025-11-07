@@ -1,0 +1,17 @@
+--- 
+- name: "Just test some playbook input"
+  hosts: localhost
+  gather_facts: yes
+
+  vars_prompt:
+
+    - name: choice
+      prompt: "1: ┌─[user💀hostname]⚡⚡[/some/random/path]⚡⚡[0000]\n   └─[$]\n2: ┌─[user🎃hostname]🩸🩸[/some/random/path]🩸🩸[0000]\n   └─[$]\n\nYour choice: "
+      private: false
+
+  tasks:
+
+    - name: Get the bash script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/Chibraax/Ansible_playbooks/refs/heads/main/setup_make_my_shell/setup.sh
+        dest: "{{ ansible_user_dir }}/tools"

@@ -10,8 +10,18 @@
       private: false
 
   tasks:
-
     - name: Get the bash script
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/Chibraax/Ansible_playbooks/refs/heads/main/setup_make_my_shell/setup.sh
-        dest: "{{ ansible_user_dir }}/tools"
+        dest: "{{ ansible_user_dir }}/setup.sh"
+        mode: 0744
+
+    - name: Execute the bash script 
+      ansible.builtin.command: 
+        "{{ ansible_user_dir }}/setup.sh {{ choice }}"
+      args:
+        executable: /bin/bash
+      register: output
+
+    - debug:
+        var: output.stdout_lines

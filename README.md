@@ -8,8 +8,8 @@ All ansible playbooks, sometimes very usefull
   </h1>
   <p align="center">Ansible playbook that deploy a pre-config ZSH shell with many plugins</p>
   <p align="center">
-    <img src="https://github.com/Chibraax/make_my_shell/blob/main/images/1.png?raw=true" width="500" />
-    <img src="https://github.com/Chibraax/make_my_shell/raw/main/images/2.png" width="500" />
+    <img src="https://github.com/Chibraax/make_my_shell/blob/main/images/1.png" width="550" />
+    <img src="https://github.com/Chibraax/make_my_shell/raw/main/images/2.png" width="550" />
   </p>
 </p>
 

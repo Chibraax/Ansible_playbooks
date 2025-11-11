@@ -1,6 +1,6 @@
 --- 
 
-- name: Install automatically custom SHELL (github.com/Chibraax/make_my_shell)
+- name: Install automatically custom SHELL (https://github.com/Chibraax/Ansible_playbooks)
   hosts: all
   gather_facts: yes 
   tasks:

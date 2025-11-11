@@ -4,6 +4,11 @@
   hosts: all
   gather_facts: yes 
   tasks:
+      - name: update cache 
+        ansible.builtin.shell: | 
+          sudo apt update
+        become: true
+      
       - name: Install every system packages
         apt:
           name: "{{ item }}"
@@ -16,7 +21,7 @@
           - fzf 
           - lsd 
           - bat
-        become_user: "{{ ansible_user }}"
+        become: true
       
       - name: Make sure to remove every install of zsh
         ansible.builtin.shell: |

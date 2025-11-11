@@ -4,20 +4,81 @@
   hosts: all
   gather_facts: yes 
   tasks:
-      - name: Clone repo 
-        git:
-          repo: https://github.com/Chibraax/make_my_shell
-          dest: "{{ ansible_user_dir }}/make_my_shell"
-          version: main
+      - name: Install every system packages
+        apt:
+          name: "{{ item }}"
+          state: present
+        with_items:
+          - git
+          - curl 
+          - zsh 
+          - wget 
+          - fzf 
+          - lsd 
+          - bat
+        become_user: "{{ ansible_user }}"
+      
+      - name: Make sure to remove every install of zsh
+        ansible.builtin.shell: |
+          rm -r /home/{{ ansible_user }}/.zshrc 
+          rm -rf /home/{{ ansible_user }}/.oh-my-zsh
 
-      - name: Check permission on the shell script
-        shell: |
-          chmod +x setup.sh
-          ./setup.sh
-        args:
-          chdir: "{{ ansible_user_dir }}/make_my_shell/"
-        register: output
-      - debug:
-          var : output.stdout_lines
+      - name: Install oh my zsh with the recommend way 
+        ansible.builtin.get_url:
+          url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+          dest: /home/{{ ansible_user }}/
+          mode: 0777
+
+      - name: Execute the shell script
+        ansible.builtin.command: >
+          sh install.sh --unattended /home/{{ ansible_user }}/install.sh
         
+      - name: Install ohmyzsh plugins
+        git:
+          repo: "https://github.com/zsh-users/{{ item }}"
+          dest: "/home/{{ ansible_user }}//.oh-my-zsh/plugins/{{ item }}"
+        with_items:
+          - zsh-completions
+          - zsh-syntax-highlighting
+          - zsh-autosuggestions
+
+      - name: Add plugins into .zshrc
+        ansible.builtin.lineinfile:
+          path: "{{ ansible_user_dir }}/.zshrc"
+          search_string: 'plugins=(git)'
+          line: plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf)
+
+      - name: Check file (bat) 
+        stat:
+          path: /usr/bin/batcat
+        register: file_status
+
+      - name: Edit .zshrc for aliases
+        blockinfile:
+          path: "{{ ansible_user_dir }}/.zshrc"
+          block: | 
+            # Custom made my Ansible playbook make_my_shell (https://github.com/Chibraax)
+            alias ls=/usr/bin/lsd
+            alias cat=/usr/bin/batcat
+        when: file_status.stat.exists
+
+      - name: Copy .zsh-theme on the remote host 
+        copy:
+          src: "{{ item }}"
+          dest: "{{ ansible_user_dir }}/.oh-my-zsh/themes"
+        with_items:
+          - chibraax.zsh-theme
+          - chibraax2.zsh-theme
+
+      - name: Edit the ZSH_THEME var env 
+        lineinfile:
+          path: "{{ ansible_user_dir }}/.zshrc"
+          regexp: '^ZSH_THEME='
+          line: ZSH_THEME="chibraax2"
+          
+      - name: Ensure default shell is /usr/bin/zsh for "{{ ansible_user }}"
+        ansible.builtin.user:
+          name: "{{ ansible_user }}"
+          shell: /usr/bin/zsh
+        become: true
 

@@ -1,9 +1,18 @@
 
    <p align="center">
-    <img src="https://github.com/Chibraax/make_my_shell/blob/main/images/1.png?raw=true" width="500" />
+    <img src="https://github.com/Chibraax/make_my_shell/blob/main/images/1.png" width="500" />
     <img src="https://github.com/Chibraax/make_my_shell/raw/main/images/2.png" width="500" />
   </p>
  
+ 
+# Before (classic BASH):
+
+ <img src="https://github.com/Chibraax/make_my_shell/blob/main/images/1.png" alt="before auto_zsh script "> 
+
+# After : 
+
+ <img src="https://github.com/Chibraax/make_my_shell/raw/main/images/2.png" alt="after auto_zsh script "> 
+
  
  # Features :
   `fzf`: By pressing Ctrl + r, you can search through your command history.

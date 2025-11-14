@@ -5,15 +5,14 @@
   gather_facts: yes 
   tasks:
       - name: update cache 
-        ansible.builtin.shell: | 
-          sudo apt update
+        ansible.builtin.shell: sudo apt update 
         become: true
-      
+
       - name: Install every system packages
         apt:
           name: "{{ item }}"
           state: present
-        with_items:
+        loop:
           - git
           - curl 
           - zsh 
@@ -22,6 +21,7 @@
           - lsd 
           - bat
         become: true
+        tags: apt_packages
       
       - name: Make sure to remove every install of zsh
         ansible.builtin.shell: |
@@ -42,7 +42,7 @@
         git:
           repo: "https://github.com/zsh-users/{{ item }}"
           dest: "/home/{{ ansible_user }}//.oh-my-zsh/plugins/{{ item }}"
-        with_items:
+        loop:
           - zsh-completions
           - zsh-syntax-highlighting
           - zsh-autosuggestions
@@ -71,7 +71,7 @@
         copy:
           src: "{{ item }}"
           dest: "{{ ansible_user_dir }}/.oh-my-zsh/themes"
-        with_items:
+        loop:
           - chibraax.zsh-theme
           - chibraax2.zsh-theme
 

@@ -7,6 +7,7 @@
       - name: update cache 
         ansible.builtin.shell: sudo apt update 
         become: true
+        tags: apt_packages
 
       - name: Install every system packages
         apt:
